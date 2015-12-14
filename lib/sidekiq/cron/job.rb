@@ -387,9 +387,11 @@ module Sidekiq
           #add informations for this job!
           conn.hmset redis_key, *hash_to_redis(to_hash)
 
-          #add information about last time! - don't enque right after scheduler poller starts!
-          time = Time.now
-          conn.zadd(job_enqueued_key, time.to_f.to_s, formated_last_time(time).to_s)
+          # Don't add last time because we have multiple works getting started and stopped
+          # so this causes problems with some of them by not allowing it to run...
+          # add information about last time! - don't enque right after scheduler poller starts!
+          # time = Time.now
+          # conn.zadd(job_enqueued_key, time.to_f.to_s, formated_last_time(time).to_s)
         end
         logger.info { "Cron Jobs - add job with name: #{@name}" }
       end
